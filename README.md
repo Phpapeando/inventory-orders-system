@@ -1,61 +1,108 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistema de gerenciamento de pedidos e estoque
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema ainda em desenvolvimento.
 
-## About Laravel
+Este projeto utiliza Docker para configurar um ambiente de desenvolvimento para uma aplicação Laravel, incluindo um banco de dados MySQL e um servidor web Nginx.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Pré-requisitos
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Certifique-se de ter as seguintes ferramentas instaladas:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Docker**: Ferramenta para criar, implantar e rodar containers.
+- **Docker Compose**: Ferramenta para definir e executar aplicativos Docker com múltiplos containers.
 
-## Learning Laravel
+## Executando o Projeto
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Passo 1: Clonar o Repositório
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Clone este repositório para sua máquina local:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+git clone https://github.com/Phpapeando/inventory-orders-system.git
+cd inventory-orders-system
+```
 
-## Laravel Sponsors
+### Passo 2: Rodar os Containers Docker
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Execute o comando make build para configurar e iniciar os containers (Primeira Execução):
 
-### Premium Partners
+```bash
+make build
+```
+Utilize o `make build` somente na primeira vez que executar o projeto. 
+Nas execuções subsequentes você poderá utilizar o `make up` para iniciar os containers de forma mais rápida.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development/)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+make up
+```
 
-## Contributing
+Caso você não tenha o make instalado na sua máquina siga as etapas abaixo:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. Copie o arquivo .env.example para .env.
 
-## Code of Conduct
+2. Crie os arquivos de log `access.log` e `error.log` dentro do diretório `nginx` na raiz do projeto.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+    ```bash
+    touch nginx/access.log nginx/error.log
+    ```
 
-## Security Vulnerabilities
+3. Execute o comando `docker-compose up -d --build` para construir e iniciar os containers do Docker.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+4. Execute `docker exec -it lara_docker_env_app bash` para acessar o container do app e em seguida rode os seguintes comandos dentro do container:
 
-## License
+    - composer install: Instala as dependências do Laravel.
+    ```bash
+    composer install
+    ```
+    - php artisan migrate: Executa as migrações do banco de dados.
+    ```bash
+    php artisan migrate
+    ```
+    - php artisan key:generate: Gera a chave de aplicação do Laravel.
+    ```bash
+    php artisan key:generate
+    ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Passo 3: Acessar a Aplicação
+
+Após os containers estarem em funcionamento, a aplicação estará acessível no seu navegador no endereço:
+
+```
+http://localhost:8088
+```
+
+---
+
+## Comandos Disponíveis no `Makefile`
+
+- **`make build`**: Constrói os containers Docker e configura a aplicação.
+- **`make up`**: Sobe os containers Docker depois de configurados (usado após make build).
+- **`make down`**: Derruba os containers, redes e volumes definidos no `docker-compose.yml`.
+- **`make clean`**: Limpa containers, imagens e volumes associados ao projeto. Cuidado, esse comando afeta todo o Docker!
+
+---
+
+## Problemas Comuns
+
+### 1. **Erro ao acessar o Nginx**
+Se você não conseguir acessar o servidor Nginx na porta `8088`, tente verificar se o container está rodando corretamente com:
+
+```bash
+docker ps
+```
+
+Verifique também os logs do Nginx para detectar possíveis problemas:
+
+```bash
+docker logs lara_docker_env_nginx
+```
+
+### 2. **Erro ao gerar a chave da aplicação (APP_KEY)**
+Caso o comando `php artisan key:generate` não funcione dentro do container, execute-o fora do container, diretamente no seu terminal local:
+
+É necessário ter o PHP e o Composer instalado para que o comando funcione.
+
+```bash
+docker exec -it lara_docker_env_app bash
+php artisan key:generate
+```

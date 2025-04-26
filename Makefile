@@ -9,9 +9,7 @@ build:
 	@echo "Subindo containers Docker..."
 	docker compose up -d --build
 	@echo "Instalando dependências no container..."
-	docker exec -it lara_docker_env_app bash -c "composer install && php artisan migrate"
-	@echo "Gerando APP_KEY fora do container..."
-	php artisan key:generate
+	docker exec -it lara_docker_env_app bash -c "composer install && php artisan migrate && php artisan key:generate"
 
 up:
 	@echo "Subindo containers Docker..."
@@ -20,3 +18,7 @@ up:
 down:
 	@echo "Derrubando containers Docker..."
 	docker compose down
+
+clean:
+	@echo "Removendo containers relacionados a esse projeto..."
+	docker compose down --volumes --rmi all --remove-orphans
